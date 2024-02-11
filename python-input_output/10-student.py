@@ -15,9 +15,12 @@ class Student:
         self.last_name = last_name
         self.age = age
 
-    def to_json(self, lis=[]):
+    def to_json(self, lis=[2]):
         if isinstance(lis, list):
+            if lis[0] == 2:
+                return self.__dict__
             if len(lis) == 0:
+                self.__dict__.clear()
                 return self.__dict__
             dic = self.__dict__
             new = {}
@@ -26,10 +29,3 @@ class Student:
                     value = dic[i]
                     new[i] = value
         return new
-
-    def reload_from_json(self, json):
-        if len(json) != 0:
-            for i in json.keys():
-                if i in self.__dict__:
-                    self.__dict__[i] = json[i]
-        return self.__dict__
