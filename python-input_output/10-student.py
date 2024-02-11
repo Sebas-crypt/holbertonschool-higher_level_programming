@@ -1,31 +1,29 @@
 #!/usr/bin/python3
-"""a script that creates a class"""
+"""student"""
 
 
 class Student:
-    """a class called student that has the following atttributes
-        Attributes:
-            first_name
-            last_name
-            age
-            _json: retrieves a dictionary of the instance attributes
-    """
+    """student"""
+
     def __init__(self, first_name, last_name, age):
+        """student
+
+        Args:
+            first_name: first student name
+            last_name: student last name
+            age: student age
+        """
         self.first_name = first_name
         self.last_name = last_name
         self.age = age
 
-    def to_json(self, lis=[2]):
-        if isinstance(lis, list):
-            if lis[0] == 2:
-                return self.__dict__
-            if len(lis) == 0:
-                self.__dict__.clear()
-                return self.__dict__
-            dic = self.__dict__
-            new = {}
-            for i in lis:
-                if i in dic:
-                    value = dic[i]
-                    new[i] = value
-        return new
+    def to_json(self, attrs=None):
+        """student to json
+
+        Args:
+            self: instance
+            attrs: attributes
+        """
+        if type(attrs) is list and all(type(ele) is str for ele in attrs):
+            return {k: getattr(self, k) for k in attrs if hasattr(self, k)}
+        return self.__dict__
