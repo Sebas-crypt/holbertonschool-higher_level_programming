@@ -11,15 +11,6 @@ if __name__ == "__main__":
     st.execute("SELECT `id`, `name` FROM states WHERE name LIKE BINARY 'N%'\
                ORDER BY `id`;")
     res = st.fetchall()
-
-    if len(res) == 2:
-        print("Found 2 records:")
-        for i in res:
-            print(i)
-    else:
-        print("Found the following records:")
-        for i in res:
-            print(i)
-
+    for i in res:
+        print(i)
     db.close()
-
