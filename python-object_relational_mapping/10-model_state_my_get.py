@@ -1,26 +1,22 @@
 #!/usr/bin/python3
-"""A script that uses sqlalchemy ORM to search for a state in database."""
-
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+"""List all states"""
+from sys import argv
 from model_state import Base, State
+from sqlalchemy import (create_engine)
+from sqlalchemy.orm import sessionmaker
 
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    port = 3306
-    search = sys.argv[4]
     engine = create_engine(
-        f"mysql://{username}:{password}@localhost:\
-            {port}/{database}"
-            )
-    Session_class = sessionmaker(bind=engine)
-    with Session_class() as session:
-        result = session.query(State).order_by(State.id).\
-                filter_by(name=search).first()
-        if result is None:
-            print("Not found")
-        else:
-            print(result.id)
+        'mysql+mysqldb://{}:{}@localhost/{}'
+        .format(argv[1], argv[2],
+                argv[3]), pool_pre_ping=True)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    states = session.query(State).\
+        filter(State.name == argv[4]).order_by(State.id).all()
+    if states:
+        print("{}".format(states[0].id))
+    else:
+        print("Not found")
+    session.close()
