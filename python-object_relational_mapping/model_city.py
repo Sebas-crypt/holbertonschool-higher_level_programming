@@ -1,12 +1,15 @@
 #!/usr/bin/python3
-"""A Script that maps a class to a database table."""
-from model_state import Base
+"""Module that creates the definition of a City class"""
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+
+
+Base = declarative_base()
 
 
 class City(Base):
-    """A class that is mapped to cities table"""
-    __tablename__ = "cities"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    state_id = Column(Integer, ForeignKey("states.id"), nullable=False)
+    """Class City that inherits from Base"""
+    __tablename__ = 'cities'
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = Column(String(128), nullable=False)
+    state_id = Column(Integer, ForeignKey('states.id'), nullable=False)

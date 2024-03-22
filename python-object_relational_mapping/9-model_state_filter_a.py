@@ -1,23 +1,24 @@
 #!/usr/bin/python3
-"""A script that uses sqlalchemy ORM to list states with a in database."""
-
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+"""Filters all the states that have 'a' in their name"""
+from sys import argv
 from model_state import Base, State
+from sqlalchemy import (create_engine)
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    port = 3306
-    engine = create_engine(
-        f"mysql://{username}:{password}@localhost:\
-            {port}/{database}"
-            )
-    Session_class = sessionmaker(bind=engine)
-    with Session_class() as session:
-        result = session.query(State).order_by(State.id).\
-                filter(State.name.like('%a%')).all()
-        for record in result:
-            print(f"{record.id}: {record.name}")
+    db = create_engine(
+        "mysql+mysqldb://{}:{}@localhost/{}".format(argv[1], argv[2], argv[3]),
+        pool_pre_ping=True)
+    Base.metadata.create_all(db)
+    # Create a premade "Session" class
+    Session = sessionmaker(bind=db)
+    # Instance of the Session
+    ses = Session()
+    # Make a query
+    res = ses.query(State).filter(State.name.like(func.binary('%a%')))\
+        .order_by(State.id).all()
+    for item in res:
+        print('{}: {}'.format(item.id, item.name))
+    # Close the instance of session
+    ses.close()

@@ -1,37 +1,24 @@
 #!/usr/bin/python3
-"""
-    A script that prints the State object with the name passed as an argument
-    from hbtn_0e_6_usa
-    Username, password, dbname and name to search
-    will be passed as arguments to the script.
-"""
-
-
-import sys
+"""Lists all the states"""
+from sys import argv
 from model_state import Base, State
+from sqlalchemy import (create_engine)
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
 
-if __name__ == '__main__':
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/{}'.format(
-                           sys.argv[1], sys.argv[2], sys.argv[3]),
-                           pool_pre_ping=True)
-
-    Session = sessionmaker(bind=engine)
-
-    Base.metadata.create_all(engine)
-
-    # create a session
-    session = Session()
-
-    # extract first state
-    states = session.query(State) \
-                    .filter(State.name == sys.argv[4]).one_or_none()
-
-    # print state.id
-    if states is None:
+if __name__ == "__main__":
+    db = create_engine(
+        "mysql+mysqldb://{}:{}@localhost/{}".format(argv[1], argv[2], argv[3]),
+        pool_pre_ping=True)
+    Base.metadata.create_all(db)
+    # Create a premade "Session" class
+    Session = sessionmaker(bind=db)
+    # Instance of the Session
+    ses = Session()
+    # Make a query
+    res = ses.query(State).filter_by(name=argv[4]).order_by(State.id).all()
+    if not res:
         print("Not found")
-    else:
-        print(states.id)
-
-    session.close()
+    for item in res:
+        print(item.id)
+    # Close the instance of session
+    ses.close()

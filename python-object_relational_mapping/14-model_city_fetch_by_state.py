@@ -1,27 +1,24 @@
 #!/usr/bin/python3
-"""A script that joins two tables."""
-
-import sys
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+"""Lists all the states"""
+from sys import argv
 from model_state import Base, State
 from model_city import City
-
+from sqlalchemy import (create_engine)
+from sqlalchemy.orm import sessionmaker
 
 if __name__ == "__main__":
-    arg = sys.argv
-    username = arg[1]
-    passwd = arg[2]
-    database = arg[3]
-    if len(arg) == 4:
-        engine = create_engine(
-                "mysql+mysqldb://{}:{}@localhost:3306/{}".
-                format(username, passwd, database)
-                )
-    Session = sessionmaker(bind=engine)
-    with Session() as session_object:
-        result = session_object.query(State, City).\
-            filter(State.id == City.state_id)
-        result = result.order_by(City.id).all()
-        for state, city in result:
-            print("{}: ({}) {}".format(state.name, city.id, city.name))
+    db = create_engine(
+        "mysql+mysqldb://{}:{}@localhost/{}".format(argv[1], argv[2], argv[3]),
+        pool_pre_ping=True)
+    Base.metadata.create_all(db)
+    # Create a premade "Session" class
+    Session = sessionmaker(bind=db)
+    # Instance of the Session
+    ses = Session()
+    # Make a query
+    res = ses.query(State, City).order_by(City.id).filter(State.id ==
+                                                          City.state_id)
+    for item in res:
+        print('{}: ({}) {}'.format(item[0].name, item[1].id, item[1].name))
+    # Close the instance of session
+    ses.close()

@@ -1,24 +1,24 @@
 #!/usr/bin/python3
-"""A script that uses sqlalchemy ORM to list the first state in database."""
-
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+"""Lists the first state"""
+from sys import argv
 from model_state import Base, State
+from sqlalchemy import (create_engine)
+from sqlalchemy.orm import sessionmaker
 
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    port = 3306
-    engine = create_engine(
-        f"mysql://{username}:{password}@localhost:\
-            {port}/{database}"
-            )
-    Session_class = sessionmaker(bind=engine)
-    with Session_class() as session:
-        result = session.query(State).order_by(State.id).first()
-        if result is None:
-            print("Nothing")
-        else:
-            print(f"{result.id}: {result.name}")
+    db = create_engine(
+        "mysql+mysqldb://{}:{}@localhost/{}".format(argv[1], argv[2], argv[3]),
+        pool_pre_ping=True)
+    Base.metadata.create_all(db)
+    # Create a premade "Session" class
+    Session = sessionmaker(bind=db)
+    # Instance of the Session
+    ses = Session()
+    # Make a query
+    res = ses.query(State).first()
+    if not res:
+        print("Nothing")
+    else:
+        print('{}: {}'.format(res.id, res.name))
+    # Close the instance of session
+    ses.close()

@@ -1,19 +1,17 @@
 #!/usr/bin/python3
-"""Lists states"""
-
+'''States filtering by input module'''
 import MySQLdb
 from sys import argv
 
+
 if __name__ == "__main__":
-    conn = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
-                           passwd=argv[2], db=argv[3], charset="utf8")
-    cur = conn.cursor()
-    query = """
-SELECT * FROM states WHERE name LIKE BINARY '{}' ORDER BY states.id ASC"""
-    query = query.format(argv[4])
-    cur.execute(query)
-    query_rows = cur.fetchall()
-    for row in query_rows:
-        print(row)
-    cur.close()
-    conn.close()
+    db = MySQLdb.connect(host='localhost', user=argv[1], passwd=argv[2],
+                         db=argv[3])
+    st = db.cursor()
+    command = "SELECT `id`, `name` FROM states WHERE BINARY states.name = '{}'"
+    command = command.format(argv[4])
+    st.execute(command)
+    res = st.fetchall()
+    for i in res:
+        print(i)
+    db.close()
