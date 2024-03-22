@@ -1,20 +1,17 @@
 #!/usr/bin/python3
-"""Added a condition to prevent SQL injection."""
+"""Lists states"""
+
 import MySQLdb
-import sys
+from sys import argv
+
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    search = sys.argv[4]
-    with MySQLdb.connect(
-            host="localhost", user=username, passwd=password, db=database
-            ) as connection:
-        cursor = connection.cursor()
-        query = "SELECT * FROM states WHERE name = '{}' ORDER BY id ASC"\
-            .format(search)
-        if ";" not in search:
-            cursor.execute(query)
-            result = cursor.fetchall()
-            for row in result:
-                print(row)
+    conn = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
+                           passwd=argv[2], db=argv[3], charset="utf8")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM states WHERE name = %s ORDER BY states.id ASC",
+                (argv[4], ))
+    query_rows = cur.fetchall()
+    for row in query_rows:
+        print(row)
+    cur.close()
+    conn.close()

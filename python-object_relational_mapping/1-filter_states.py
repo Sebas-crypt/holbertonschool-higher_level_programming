@@ -1,24 +1,17 @@
 #!/usr/bin/python3
-""" A script that lists all states from the database hbtn_0e_0_usa:
-"""
-import sys
-from MySQLdb import connect
+"""Lists states"""
+
+import MySQLdb
+from sys import argv
 
 if __name__ == "__main__":
-    arg = sys.argv
-    username = arg[1]
-    passwd = arg[2]
-    db = arg[3]          # database name
-    if len(arg) == 4:
-        with connect(
-                host="localhost", user=username,
-                password=passwd, database=db,
-                port=3306
-                ) as mysql_db:
-            cursor = mysql_db.cursor()
-            cursor.execute(
-                    "SELECT * FROM states WHERE name LIKE 'N%' ORDER BY id ASC"
-                    )
-            result = cursor.fetchall()
-            for i in result:
-                print(i)
+    conn = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
+                           passwd=argv[2], db=argv[3], charset="utf8")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM states ORDER BY states.id ASC")
+    query_rows = cur.fetchall()
+    for row in query_rows:
+        if row[1].startswith("N"):
+            print(row)
+    cur.close()
+    conn.close()

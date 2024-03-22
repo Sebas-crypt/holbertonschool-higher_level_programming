@@ -1,16 +1,16 @@
 #!/usr/bin/python3
-""" A script that utilizes MySQLdb package to list states in a database."""
+"""Lists states"""
+
 import MySQLdb
-import sys
+from sys import argv
+
 if __name__ == "__main__":
-    username = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    with MySQLdb.connect(
-            host="localhost", user=username, passwd=password, db=database
-            ) as connection:
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM states ORDER BY states.id ASC")
-        result = cursor.fetchall()
-        for row in result:
-            print(row)
+    conn = MySQLdb.connect(host="localhost", port=3306, user=argv[1],
+                           passwd=argv[2], db=argv[3], charset="utf8")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM states ORDER BY states.id ASC")
+    query_rows = cur.fetchall()
+    for row in query_rows:
+        print(row)
+    cur.close()
+    conn.close()
